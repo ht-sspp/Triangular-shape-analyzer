@@ -144,30 +144,30 @@ if uploaded:
         else:
             st.dataframe(df, use_container_width=True)
 
-        # ---- 選んだ穴を強調表示＆拡大表示 ----
-        st.subheader("特定の穴を選んで確認")
-        hole_id = st.selectbox("hole id", df["id"].tolist(), index=0)
+        # # ---- 選んだ穴を強調表示＆拡大表示 ----
+        # st.subheader("特定の穴を選んで確認")
+        # hole_id = st.selectbox("hole id", df["id"].tolist(), index=0)
 
-        # 強調オーバーレイ（切り出し画像上）
-        highlight = cv2.cvtColor(np.array(cropped), cv2.COLOR_RGB2BGR).copy()
-        cv2.drawContours(highlight, kept_contours, -1, (80, 80, 80), 1)  # 全輪郭薄く
+        # # 強調オーバーレイ（切り出し画像上）
+        # highlight = cv2.cvtColor(np.array(cropped), cv2.COLOR_RGB2BGR).copy()
+        # cv2.drawContours(highlight, kept_contours, -1, (80, 80, 80), 1)  # 全輪郭薄く
 
-        c_sel = kept_contours[int(hole_id)]
-        cv2.drawContours(highlight, [c_sel], -1, (0, 0, 255), 3)  # 選択穴太く
+        # c_sel = kept_contours[int(hole_id)]
+        # cv2.drawContours(highlight, [c_sel], -1, (0, 0, 255), 3)  # 選択穴太く
 
-        # bboxで拡大（dfにbbox列がある前提）
-        if all(k in df.columns for k in ["bbox_x", "bbox_y", "bbox_w", "bbox_h"]):
-            row = df[df["id"] == hole_id].iloc[0]
-            x, y, bw, bh = int(row["bbox_x"]), int(row["bbox_y"]), int(row["bbox_w"]), int(row["bbox_h"])
-            pad = 20
-            x0 = max(0, x - pad); y0 = max(0, y - pad)
-            x1 = min(highlight.shape[1], x + bw + pad); y1 = min(highlight.shape[0], y + bh + pad)
-            zoom = highlight[y0:y1, x0:x1]
-        else:
-            zoom = highlight  # bboxが無ければ全体
+        # # bboxで拡大（dfにbbox列がある前提）
+        # if all(k in df.columns for k in ["bbox_x", "bbox_y", "bbox_w", "bbox_h"]):
+        #     row = df[df["id"] == hole_id].iloc[0]
+        #     x, y, bw, bh = int(row["bbox_x"]), int(row["bbox_y"]), int(row["bbox_w"]), int(row["bbox_h"])
+        #     pad = 20
+        #     x0 = max(0, x - pad); y0 = max(0, y - pad)
+        #     x1 = min(highlight.shape[1], x + bw + pad); y1 = min(highlight.shape[0], y + bh + pad)
+        #     zoom = highlight[y0:y1, x0:x1]
+        # else:
+        #     zoom = highlight  # bboxが無ければ全体
 
-        st.image(cv2.cvtColor(highlight, cv2.COLOR_BGR2RGB), caption="選択穴を強調表示", use_container_width=True)
-        st.image(cv2.cvtColor(zoom, cv2.COLOR_BGR2RGB), caption=f"id={hole_id} の拡大", use_container_width=True)
+        # st.image(cv2.cvtColor(highlight, cv2.COLOR_BGR2RGB), caption="選択穴を強調表示", use_container_width=True)
+        # st.image(cv2.cvtColor(zoom, cv2.COLOR_BGR2RGB), caption=f"id={hole_id} の拡大", use_container_width=True)
 
         st.download_button(
             "CSVをダウンロード",
