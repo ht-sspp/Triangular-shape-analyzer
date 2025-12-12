@@ -1,10 +1,8 @@
-import streamlit as st
-from PIL import Image
+from streamlit_cropper import st_cropper
+from PIL import Image, ImageDraw
 import numpy as np
 import cv2
-
-from streamlit_cropper import st_cropper
-from afm_analysis import analyze_triangle_holes
+import streamlit as st
 
 st.set_page_config(page_title="AFMメタサーフェス自動解析", layout="wide")
 st.title("AFMメタサーフェス（三角穴）自動解析")
