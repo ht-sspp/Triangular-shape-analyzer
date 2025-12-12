@@ -11,7 +11,7 @@ st.title("AFMメタサーフェス（三角穴）自動解析")
 
 st.write("1) 画像をアップロード → 2) パターン領域だけドラッグで切り出し → 3) 切り出し領域の実サイズ(µm)を入力 → 4) 解析")
 
-uploaded = st.file_uploader("AFM画像（png/jpg/tif）", type=["png", "jpg", "jpeg", "tif", "tiff"])
+uploaded = st.file_uploader("AFM画像（png/jpg/tif/bmp）", type=["png", "jpg", "jpeg", "tif", "tiff", "bmp"])
 
 if uploaded:
     img = Image.open(uploaded).convert("RGB")
