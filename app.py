@@ -1,45 +1,36 @@
-from streamlit_cropper import st_cropper
-from PIL import Image, ImageDraw
+import streamlit as st
+from PIL import Image
 import numpy as np
 import cv2
-import streamlit as st
+
+from streamlit_cropper import st_cropper
+from afm_analysis import analyze_triangle_holes
 
 st.set_page_config(page_title="AFMメタサーフェス自動解析", layout="wide")
 st.title("AFMメタサーフェス（三角穴）自動解析")
 
 st.write("1) 画像をアップロード → 2) パターン領域だけドラッグで切り出し → 3) 切り出し領域の実サイズ(µm)を入力 → 4) 解析")
 
-uploaded = st.file_uploader(
-    "AFM画像（png/jpg/bmp/tif）",
-    type=["png", "jpg", "jpeg", "bmp", "tif", "tiff"]
-)
+uploaded = st.file_uploader("AFM画像（png/jpg/tif/bmp）", type=["png", "jpg", "jpeg", "tif", "tiff","bmp"])
 
 if uploaded:
     img = Image.open(uploaded).convert("RGB")
 
-    st.subheader("① 解析したい領域をドラッグで選択（正方形推奨）")
-    box = st_cropper(
-        img,
-        realtime_update=True,
-        aspect_ratio=(1, 1),
-        return_type="box",  # ←ここが重要（座標を返す）  [oai_citation:1‡Streamlit](https://discuss.streamlit.io/t/how-to-get-back-the-x-y-coordinates-with-st-cropper/46968?utm_source=chatgpt.com)
+    st.sidebar.header("解析設定")
+    field_um = st.sidebar.number_input(
+        "切り出し領域の一辺の長さ [µm]（正方形スキャン想定）",
+        min_value=0.01, value=5.0, step=0.1
     )
+    min_area_px = st.sidebar.number_input("最小穴面積しきい値 [px^2]（ノイズ除去）", min_value=0, value=50, step=10)
+    blur_sigma = st.sidebar.number_input("平滑化 sigma", min_value=0.0, value=1.0, step=0.5)
 
-    # box は {"left":..., "top":..., "width":..., "height":...}
-    left = int(box["left"]); top = int(box["top"])
-    width = int(box["width"]); height = int(box["height"])
-    right = left + width; bottom = top + height
-
-    # 元画像にROI枠を描画（見やすさアップ）
-    img_with_box = img.copy()
-    draw = ImageDraw.Draw(img_with_box)
-    draw.rectangle([left, top, right, bottom], outline=(0, 255, 255), width=4)  # シアン枠
-
-    cropped = img.crop((left, top, right, bottom))
+    st.subheader("① 解析したい領域を切り出し（ファイル情報の表示部分を除外）")
+    cropped = st_cropper(img, realtime_update=True, aspect_ratio=(1, 1))
+    st.caption("※ 正方形で切り出すのがラクです（スキャン領域が正方形の場合）")
 
     col1, col2 = st.columns(2)
     with col1:
-        st.image(img_with_box, caption="元画像（ROI枠付き）", use_container_width=True)
+        st.image(img, caption="元画像", use_container_width=True)
     with col2:
         st.image(cropped, caption="切り出し後（解析対象）", use_container_width=True)
 
